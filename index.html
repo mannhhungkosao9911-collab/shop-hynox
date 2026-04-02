@@ -1,205 +1,60 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HynoX Supreme - Shop Auto & Bank V10</title>
-    <style>
-        body { background: #000; color: #00ff41; font-family: 'Consolas', sans-serif; display: flex; flex-direction: column; align-items: center; min-height: 100vh; margin: 0; padding: 20px; }
-        .shop-box { width: 450px; background: #0a0a0a; padding: 25px; border: 2px solid #00ff41; border-radius: 20px; box-shadow: 0 0 30px #00ff41; text-align: center; margin-bottom: 20px; }
-        .method-tabs { display: flex; gap: 10px; margin-bottom: 20px; justify-content: center; }
-        .tab { padding: 10px 20px; border: 1px solid #00ff41; cursor: pointer; border-radius: 8px; font-weight: bold; }
-        .tab.active { background: #00ff41; color: #000; }
-        .content { display: none; }
-        .content.active { display: block; }
-        input, select { width: 90%; padding: 12px; margin-bottom: 15px; background: #111; border: 1px solid #00ff41; color: #fff; border-radius: 8px; outline: none; }
-        #qrBox img { width: 220px; border: 5px solid #fff; border-radius: 10px; margin: 15px 0; }
-        .warning-text { color: #ff4d4d; font-size: 13px; font-weight: bold; background: rgba(255, 0, 0, 0.1); padding: 10px; border-radius: 8px; margin-bottom: 15px; border: 1px dashed red; }
-        button { width: 90%; background: #00ff41; color: #000; border: none; padding: 15px; font-weight: bold; cursor: pointer; border-radius: 8px; font-size: 16px; }
-        .contact-link { margin-top: 20px; font-size: 13px; }
-        .contact-link a { color: #00e5ff; text-decoration: none; font-weight: bold; }
-        .history-box { width: 450px; background: #0a0a0a; border: 1px solid #555; border-radius: 15px; padding: 15px; }
-    </style>
-</head>
-<body>
-    <div class="shop-box">
-        <h1>💎 HYNOX SUPREME 💎</h1>
-        <div class="method-tabs">
-            <div id="tabCard" class="tab active" onclick="switchTab('card')">THẺ CÀO</div>
-            <div id="tabBank" class="tab" onclick="switchTab('bank')">CHUYỂN KHOẢN</div>
-        </div>
+<div id="bank" class="content">
+    <div class="warning-text">⚠️ LƯU Ý: CK PHẢI CÓ BILL + ĐÚNG NỘI DUNG. SAI KHÔNG DUYỆT!</div>
+    <div id="qrBox"><img id="qrImg" src="" alt="QR Bank"></div>
+    <p>Nội dung CK (Bắt buộc):</p>
+    <b id="bankInfo" style="color: yellow; font-size: 18px; background: #222; padding: 5px 10px; border: 1px solid #fff;"></b>
+    <button onclick="confirmBank()" style="margin-top:15px;">XÁC NHẬN ĐÃ CHUYỂN</button>
+</div>
 
-        <div id="card" class="content active">
-            <select id="package" onchange="updatePrice()"><option value="20000">3 Ngày - 20k</option><option value="40000">1 Tuần - 40k</option><option value="150000">1 Tháng - 150k</option></select>
-            <input type="text" id="serial" placeholder="Số Serial"><input type="text" id="code" placeholder="Mã Thẻ">
-            <button onclick="napThe()">XÁC NHẬN NẠP THẺ</button>
-        </div>
+<script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwLQ02AWrMpUNgDaKDaWPe6fSyO_x6CVL5ew16sNo0GF1rTcfQePmNfJLjj1Qd0nI-TdQ/exec";
+    let currentOrderCode = "";
 
-        <div id="bank" class="content">
-            <div class="warning-text">⚠️ LƯU Ý: CHUYỂN KHOẢN PHẢI CÓ BILL + ĐÚNG NỘI DUNG. SAI NỘI DUNG KHÔNG DUYỆT!</div>
-            <div id="qrBox"><img id="qrImg" src="" alt="QR Bank"></div>
-            <p style="margin: 5px 0;">Nội dung: <b id="bankInfo" style="color: yellow; font-size: 20px;"></b></p>
-            <button onclick="confirmBank()">XÁC NHẬN ĐÃ CHUYỂN</button>
-        </div>
+    // Hàm tạo nội dung CK thông minh theo đúng ý HynoX
+    function generateOrderCode() {
+        const pkgSelect = document.getElementById('package');
+        const pkgName = pkgSelect.options[pkgSelect.selectedIndex].text.split(' - ')[0].replace(' ', '').toUpperCase(); // Lấy "3NGAY", "1TUAN"...
         
-        <div class="contact-link">
-            Lỗi liên hệ: <a href="https://www.facebook.com/pham.nguyen.manh.hung.2025?locale=vi_VN" target="_blank">Facebook Admin HynoX</a>
-        </div>
-    </div>
-
-    <div class="history-box">
-        <h3 style="color: #00ff41; margin-top: 0;">🕒 LỊCH SỬ MUA</h3>
-        <div id="historyList">Chưa có giao dịch...</div>
-    </div>
-
-    <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwLQ02AWrMpUNgDaKDaWPe6fSyO_x6CVL5ew16sNo0GF1rTcfQePmNfJLjj1Qd0nI-TdQ/exec";
-        let currentOrderCode = "";
-
-        window.onload = () => { loadHistory(); updatePrice(); };
-
-        function switchTab(id) {
-            document.querySelectorAll('.tab, .content').forEach(el => el.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            document.getElementById(id === 'card' ? 'tabCard' : 'tabBank').classList.add('active');
-            if(id === 'bank') generateOrderCode();
-        }
-
-        function generateOrderCode() {
-            currentOrderCode = "HYNOX" + Math.floor(1000 + Math.random() * 9000);
-            document.getElementById('bankInfo').innerText = currentOrderCode;
-            const amount = document.getElementById('package').value;
-            // Link QR MB Bank của chị Phạm Thị Khánh Chi (Số TK: 0040877165)
-            document.getElementById('qrImg').src = `https://api.vietqr.io/image/970422-0040877165-qr_only.jpg?amount=${amount}&addInfo=${currentOrderCode}`;
-        }
-
-        function updatePrice() { if(document.getElementById('bank').classList.contains('active')) generateOrderCode(); }
-
-        async function napThe() {
-            const res = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({
-                type: "GARENA", serial: document.getElementById('serial').value, code: document.getElementById('code').value, package: document.getElementById('package').selectedOptions[0].text
-            })});
-            const result = await res.json();
-            if(result.status === "success") { saveHistory(result.key); alert("Nạp thành công! Check lịch sử."); }
-            else alert(result.msg);
-        }
-
-        function confirmBank() {
-            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ action: "confirm_bank", orderCode: currentOrderCode, package: document.getElementById('package').selectedOptions[0].text })});
-            alert("Đã gửi yêu cầu! Vui lòng chụp bill và chờ HynoX duyệt.");
-        }
-
-        function saveHistory(key) {
-            let h = JSON.parse(localStorage.getItem('h_v10') || "[]");
-            h.unshift({ t: new Date().toLocaleString(), k: key });
-            localStorage.setItem('h_v10', JSON.stringify(h.slice(0, 5))); loadHistory();
-        }
-
-        function loadHistory() {
-            let h = JSON.parse(localStorage.getItem('h_v10') || "[]");
-            document.getElementById('historyList').innerHTML = h.map(i => `<div style="border-bottom:1px solid #222; padding:5px;">${i.t} - Key: ${i.k}</div>`).join('');
-        }
-    </script>
-</body>
-</html><!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HynoX Supreme - Shop Auto & Bank V10</title>
-    <style>
-        body { background: #000; color: #00ff41; font-family: 'Consolas', sans-serif; display: flex; flex-direction: column; align-items: center; min-height: 100vh; margin: 0; padding: 20px; }
-        .shop-box { width: 450px; background: #0a0a0a; padding: 25px; border: 2px solid #00ff41; border-radius: 20px; box-shadow: 0 0 30px #00ff41; text-align: center; margin-bottom: 20px; }
-        .method-tabs { display: flex; gap: 10px; margin-bottom: 20px; justify-content: center; }
-        .tab { padding: 10px 20px; border: 1px solid #00ff41; cursor: pointer; border-radius: 8px; font-weight: bold; }
-        .tab.active { background: #00ff41; color: #000; }
-        .content { display: none; }
-        .content.active { display: block; }
-        input, select { width: 90%; padding: 12px; margin-bottom: 15px; background: #111; border: 1px solid #00ff41; color: #fff; border-radius: 8px; outline: none; }
-        #qrBox img { width: 220px; border: 5px solid #fff; border-radius: 10px; margin: 15px 0; }
-        .warning-text { color: #ff4d4d; font-size: 13px; font-weight: bold; background: rgba(255, 0, 0, 0.1); padding: 10px; border-radius: 8px; margin-bottom: 15px; border: 1px dashed red; }
-        button { width: 90%; background: #00ff41; color: #000; border: none; padding: 15px; font-weight: bold; cursor: pointer; border-radius: 8px; font-size: 16px; }
-        .contact-link { margin-top: 20px; font-size: 13px; }
-        .contact-link a { color: #00e5ff; text-decoration: none; font-weight: bold; }
-        .history-box { width: 450px; background: #0a0a0a; border: 1px solid #555; border-radius: 15px; padding: 15px; }
-    </style>
-</head>
-<body>
-    <div class="shop-box">
-        <h1>💎 HYNOX SUPREME 💎</h1>
-        <div class="method-tabs">
-            <div id="tabCard" class="tab active" onclick="switchTab('card')">THẺ CÀO</div>
-            <div id="tabBank" class="tab" onclick="switchTab('bank')">CHUYỂN KHOẢN</div>
-        </div>
-
-        <div id="card" class="content active">
-            <select id="package" onchange="updatePrice()"><option value="20000">3 Ngày - 20k</option><option value="40000">1 Tuần - 40k</option><option value="150000">1 Tháng - 150k</option></select>
-            <input type="text" id="serial" placeholder="Số Serial"><input type="text" id="code" placeholder="Mã Thẻ">
-            <button onclick="napThe()">XÁC NHẬN NẠP THẺ</button>
-        </div>
-
-        <div id="bank" class="content">
-            <div class="warning-text">⚠️ LƯU Ý: CHUYỂN KHOẢN PHẢI CÓ BILL + ĐÚNG NỘI DUNG. SAI NỘI DUNG KHÔNG DUYỆT!</div>
-            <div id="qrBox"><img id="qrImg" src="" alt="QR Bank"></div>
-            <p style="margin: 5px 0;">Nội dung: <b id="bankInfo" style="color: yellow; font-size: 20px;"></b></p>
-            <button onclick="confirmBank()">XÁC NHẬN ĐÃ CHUYỂN</button>
-        </div>
+        // Kiểm tra xem khách có tích chọn HWID không (Dựa vào bản V10 của ông)
+        const hasHwid = document.getElementById('addHwid') && document.getElementById('addHwid').checked ? "HWID" : "NO";
         
-        <div class="contact-link">
-            Lỗi liên hệ: <a href="https://www.facebook.com/pham.nguyen.manh.hung.2025?locale=vi_VN" target="_blank">Facebook Admin HynoX</a>
-        </div>
-    </div>
+        const randomNum = Math.floor(1000 + Math.random() * 9000);
+        
+        // Nội dung cuối cùng: Ví dụ "3NGAY HWID 1234" hoặc "1THANG NO 5678"
+        currentOrderCode = `${pkgName} ${hasHwid} ${randomNum}`;
+        document.getElementById('bankInfo').innerText = currentOrderCode;
 
-    <div class="history-box">
-        <h3 style="color: #00ff41; margin-top: 0;">🕒 LỊCH SỬ MUA</h3>
-        <div id="historyList">Chưa có giao dịch...</div>
-    </div>
+        const amount = pkgSelect.value;
+        const extra = (document.getElementById('addHwid') && document.getElementById('addHwid').checked) ? 20000 : 0;
+        const total = parseInt(amount) + extra;
 
-    <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwLQ02AWrMpUNgDaKDaWPe6fSyO_x6CVL5ew16sNo0GF1rTcfQePmNfJLjj1Qd0nI-TdQ/exec";
-        let currentOrderCode = "";
+        // Cập nhật QR với nội dung và tổng tiền mới nhất
+        document.getElementById('qrImg').src = `https://api.vietqr.io/image/970422-0040877165-qr_only.jpg?amount=${total}&addInfo=${encodeURIComponent(currentOrderCode)}`;
+    }
 
-        window.onload = () => { loadHistory(); updatePrice(); };
+    // Khi nạp thẻ thành công, nó sẽ tự lưu vào lịch sử máy khách
+    function saveHistory(key) {
+        let h = JSON.parse(localStorage.getItem('h_v11') || "[]");
+        h.unshift({ 
+            t: new Date().toLocaleString(), 
+            k: key,
+            p: document.getElementById('package').selectedOptions[0].text 
+        });
+        localStorage.setItem('h_v11', JSON.stringify(h.slice(0, 10))); // Lưu 10 cái gần nhất
+        loadHistory();
+    }
 
-        function switchTab(id) {
-            document.querySelectorAll('.tab, .content').forEach(el => el.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            document.getElementById(id === 'card' ? 'tabCard' : 'tabBank').classList.add('active');
-            if(id === 'bank') generateOrderCode();
+    function loadHistory() {
+        let h = JSON.parse(localStorage.getItem('h_v11') || "[]");
+        const list = document.getElementById('historyList');
+        if(h.length > 0) {
+            list.innerHTML = h.map(i => `
+                <div style="border-bottom:1px solid #222; padding:8px; font-size:12px;">
+                    <div style="color:#00ff41">${i.p} (${i.t})</div>
+                    <div style="color:white; word-break:break-all;">Key: ${i.k}</div>
+                    <button onclick="navigator.clipboard.writeText('${i.k}');alert('Đã copy!')" style="font-size:10px; cursor:pointer;">Copy Key</button>
+                </div>
+            `).join('');
         }
-
-        function generateOrderCode() {
-            currentOrderCode = "HYNOX" + Math.floor(1000 + Math.random() * 9000);
-            document.getElementById('bankInfo').innerText = currentOrderCode;
-            const amount = document.getElementById('package').value;
-            // Link QR MB Bank của chị Phạm Thị Khánh Chi (Số TK: 0040877165)
-            document.getElementById('qrImg').src = `https://api.vietqr.io/image/970422-0040877165-qr_only.jpg?amount=${amount}&addInfo=${currentOrderCode}`;
-        }
-
-        function updatePrice() { if(document.getElementById('bank').classList.contains('active')) generateOrderCode(); }
-
-        async function napThe() {
-            const res = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({
-                type: "GARENA", serial: document.getElementById('serial').value, code: document.getElementById('code').value, package: document.getElementById('package').selectedOptions[0].text
-            })});
-            const result = await res.json();
-            if(result.status === "success") { saveHistory(result.key); alert("Nạp thành công! Check lịch sử."); }
-            else alert(result.msg);
-        }
-
-        function confirmBank() {
-            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ action: "confirm_bank", orderCode: currentOrderCode, package: document.getElementById('package').selectedOptions[0].text })});
-            alert("Đã gửi yêu cầu! Vui lòng chụp bill và chờ HynoX duyệt.");
-        }
-
-        function saveHistory(key) {
-            let h = JSON.parse(localStorage.getItem('h_v10') || "[]");
-            h.unshift({ t: new Date().toLocaleString(), k: key });
-            localStorage.setItem('h_v10', JSON.stringify(h.slice(0, 5))); loadHistory();
-        }
-
-        function loadHistory() {
-            let h = JSON.parse(localStorage.getItem('h_v10') || "[]");
-            document.getElementById('historyList').innerHTML = h.map(i => `<div style="border-bottom:1px solid #222; padding:5px;">${i.t} - Key: ${i.k}</div>`).join('');
-        }
-    </script>
-</body>
-</html>
+    }
+</script>
