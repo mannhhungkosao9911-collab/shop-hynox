@@ -2,142 +2,130 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HYNOX SUPREME SHOP - ALL IN ONE</title>
+    <title>HYNOX SUPREME SHOP</title>
     <style>
-        body { background: #000; color: #00ff41; font-family: 'Consolas', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; margin: 0; }
-        .shop-box { width: 100%; max-width: 450px; background: #0a0a0a; padding: 25px; border: 2px solid #00ff41; border-radius: 20px; box-shadow: 0 0 30px #00ff41; text-align: center; box-sizing: border-box; }
-        .method-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
-        .tab { flex: 1; padding: 12px; border: 1px solid #00ff41; cursor: pointer; border-radius: 8px; font-weight: bold; transition: 0.3s; }
-        .tab.active { background: #00ff41; color: #000; }
-        .content { display: none; }
-        .content.active { display: block; }
-        input, select { width: 100%; padding: 12px; margin-bottom: 15px; background: #111; border: 1px solid #00ff41; color: #fff; border-radius: 8px; box-sizing: border-box; outline: none; }
-        #qrBox img { width: 220px; border: 5px solid #fff; border-radius: 10px; margin: 15px 0; background: #fff; }
-        .warning-text { color: #ff4d4d; font-size: 13px; font-weight: bold; background: rgba(255,0,0,0.1); padding: 10px; border-radius: 8px; border: 1px dashed red; margin-bottom: 15px; }
-        button { width: 100%; background: #00ff41; color: #000; border: none; padding: 15px; font-weight: bold; cursor: pointer; border-radius: 8px; font-size: 16px; }
+        body { background: #000; color: #00ff41; font-family: 'Consolas', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        .shop-box { width: 100%; max-width: 450px; background: #0a0a0a; padding: 25px; border: 2px solid #00ff41; border-radius: 20px; box-shadow: 0 0 30px #00ff41; text-align: center; }
+        input, select { width: 100%; padding: 12px; margin-bottom: 15px; background: #111; border: 1px solid #00ff41; color: #fff; border-radius: 8px; outline: none; box-sizing: border-box; }
+        button { width: 100%; background: #00ff41; color: #000; border: none; padding: 15px; font-weight: bold; cursor: pointer; border-radius: 8px; font-size: 16px; transition: 0.3s; }
         button:hover { background: #fff; box-shadow: 0 0 15px #fff; }
-        #bankInfo { color: yellow; font-size: 19px; background: #222; padding: 8px; border: 1px solid #fff; display: block; margin: 10px 0; }
-        .history-box { width: 100%; max-width: 450px; background: #0a0a0a; border: 1px solid #555; border-radius: 15px; padding: 15px; margin-top: 20px; box-sizing: border-box; }
+        .history-box { width: 100%; max-width: 450px; background: #0a0a0a; border: 1px solid #333; border-radius: 15px; padding: 15px; margin-top: 20px; box-sizing: border-box; }
+        .copy-btn { width: auto; padding: 5px 12px; font-size: 11px; background: #00ff41; color: #000; border-radius: 4px; cursor: pointer; }
     </style>
 </head>
 <body>
     <div class="shop-box">
-        <h1 style="margin:0 0 20px 0;">💎 HYNOX SUPREME 💎</h1>
+        <h1>💎 HYNOX SUPREME 💎</h1>
         
-        <div style="text-align: left; margin-bottom: 15px;">
+        <div style="text-align: left;">
             <label style="font-size: 12px;">CHỌN GÓI KEY:</label>
             <select id="package" onchange="updatePrice()">
                 <option value="20000">3 Ngày - 20k</option>
-                <option value="40000">1 Tuần - 40k</option>
-                <option value="150000">1 Tháng - 150k</option>
+                <option value="50000">1 Tuần - 50k</option>
+                <option value="100000">1 Tháng - 100k</option>
+                <option value="500000">Vĩnh Viễn - 500k</option>
             </select>
-            <div style="font-size: 14px; margin-bottom: 10px;">
-                <input type="checkbox" id="addHwid" onchange="updatePrice()"> <label for="addHwid">Mua thêm HWID (+20k)</label>
+
+            <div style="font-size: 11px; margin-bottom: 10px; color: #888;">
+                Cần mua thêm HWID? <a href="https://www.facebook.com/pham.nguyen.manh.hung.2025" target="_blank" style="color:#00ff41; text-decoration:none;">LIÊN HỆ ADMIN</a>
             </div>
-            <div id="totalPrice" style="color:yellow; font-size:22px; font-weight:bold; text-align:center;">TỔNG: 20.000 VNĐ</div>
-        </div>
 
-        <div class="method-tabs">
-            <div id="tabCard" class="tab active" onclick="switchTab('card')">THẺ CÀO</div>
-            <div id="tabBank" class="tab" onclick="switchTab('bank')">BANKING</div>
-        </div>
+            <div id="totalPrice" style="color:yellow; font-size:24px; font-weight:bold; text-align:center; margin-bottom:10px;">TỔNG: 20.000 VNĐ</div>
+            
+            <div style="color: #ff4d4d; font-size: 11px; font-weight: bold; text-align: center; background: rgba(255,0,0,0.1); padding: 8px; border: 1px dashed red; border-radius: 8px; margin-bottom: 15px;">
+                ⚠️ LƯU Ý: Vui lòng nạp thẻ ĐÚNG MỆNH GIÁ với gói đã chọn.
+            </div>
 
-        <div id="card" class="content active">
+            <label style="font-size: 12px;">NHÀ MẠNG:</label>
+            <select id="telco">
+                <option value="VIETTEL">Viettel</option>
+                <option value="MOBIFONE">Mobifone</option>
+                <option value="VINAPHONE">Vinaphone</option>
+                <option value="GARENA">Garena</option>
+                <option value="ZING">Zing</option>
+            </select>
+            
             <input type="text" id="serial" placeholder="Số Serial">
             <input type="text" id="code" placeholder="Mã thẻ nạp">
-            <button onclick="napThe()">XÁC NHẬN NẠP THẺ</button>
-        </div>
-
-        <div id="bank" class="content">
-            <div class="warning-text">LƯU Ý: CK PHẢI CÓ BILL + ĐÚNG NỘI DUNG.</div>
-            <div id="qrBox"><img id="qrImg" src="" alt="QR Bank"></div>
-            <p style="margin:0">Nội dung (Bắt buộc):</p>
-            <b id="bankInfo"></b>
-            <input type="text" id="billNote" placeholder="Nhập mã GD hoặc Link Bill">
-            <button onclick="confirmBank()">XÁC NHẬN ĐÃ CHUYỂN</button>
-        </div>
-        
-        <div style="margin-top:20px; font-size:12px;">
-            Lỗi liên hệ: <a href="https://www.facebook.com/pham.nguyen.manh.hung.2025?locale=vi_VN" target="_blank" style="color:#00e5ff; text-decoration:none;">Admin HynoX</a>
+            <button id="mainBtn" onclick="napThe()">XÁC NHẬN NẠP THẺ</button>
         </div>
     </div>
 
     <div class="history-box">
-        <h3 style="color:#00ff41; margin:0 0 10px 0; font-size:16px;">🕒 LỊCH SỬ MUA (Của bạn)</h3>
-        <div id="historyList" style="font-size:13px; color:#aaa;">Chưa có giao dịch...</div>
+        <h3 style="color:#00ff41; margin:0 0 10px 0;">🕒 LỊCH SỬ MUA</h3>
+        <div id="historyList">Chưa có giao dịch...</div>
     </div>
 
     <script>
-        // LINK SCRIPT MỚI CỦA ÔNG ĐÃ ĐƯỢC CẬP NHẬT TẠI ĐÂY
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwLQ02AWrMpUNgDaKDaWPe6fSyO_x6CVL5ew16sNo0GF1rTcfQePmNfJLjj1Qd0nI-TdQ/exec";
-        let currentOrderCode = "";
-
-        window.onload = () => { loadHistory(); updatePrice(); };
-
-        function switchTab(id) {
-            document.querySelectorAll('.tab, .content').forEach(el => el.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            document.getElementById(id === 'card' ? 'tabCard' : 'tabBank').classList.add('active');
-            if(id === 'bank') generateOrderCode();
-        }
+        const SCRIPT_URL = "DÁN_URL_APPS_SCRIPT_CỦA_BẠN_VÀO_ĐÂY";
 
         function updatePrice() {
-            let total = parseInt(document.getElementById('package').value) + (document.getElementById('addHwid').checked ? 20000 : 0);
-            document.getElementById('totalPrice').innerText = "TỔNG: " + total.toLocaleString() + " VNĐ";
-            generateOrderCode();
-        }
-
-        function generateOrderCode() {
-            const pkg = document.getElementById('package').selectedOptions[0].text.split(' ')[0].toUpperCase();
-            const hwid = document.getElementById('addHwid').checked ? "HWID" : "NO";
-            // Tạo mã ngẫu nhiên cho mỗi đơn hàng
-            currentOrderCode = `${pkg}_${hwid}_${Math.floor(1000 + Math.random() * 9000)}`;
-            document.getElementById('bankInfo').innerText = currentOrderCode;
-            let total = parseInt(document.getElementById('package').value) + (document.getElementById('addHwid').checked ? 20000 : 0);
-            // QR MB Bank Phạm Thị Khánh Chi - 0040877165
-            document.getElementById('qrImg').src = `https://api.vietqr.io/image/970422-0040877165-qr_only.jpg?amount=${total}&addInfo=${currentOrderCode}`;
+            let base = parseInt(document.getElementById('package').value);
+            document.getElementById('totalPrice').innerText = "TỔNG: " + base.toLocaleString() + " VNĐ";
         }
 
         async function napThe() {
-            const btn = event.target; btn.disabled = true; btn.innerText = "ĐANG XỬ LÝ...";
+            const telco = document.getElementById('telco').value;
+            const serial = document.getElementById('serial').value;
+            const code = document.getElementById('code').value;
+            const amount = document.getElementById('package').value;
+            const pkgText = document.getElementById('package').selectedOptions[0].text;
+
+            if(!serial || !code) return alert("Nhập đủ thông tin!");
+            const btn = document.getElementById('mainBtn');
+            btn.disabled = true; btn.innerText = "ĐANG KIỂM TRA...";
+
             try {
-                const res = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({
-                    type: "GARENA", serial: document.getElementById('serial').value, code: document.getElementById('code').value, package: document.getElementById('package').selectedOptions[0].text
-                })});
+                const res = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ type: telco, serial: serial, code: code, package: pkgText, amount: amount })});
                 const result = await res.json();
-                if(result.status === "success") { saveHistory(result.key); alert("THÀNH CÔNG! Key: " + result.key); }
-                else alert("LỖI: " + result.msg);
-            } catch (e) { alert("Lỗi kết nối Server!"); }
-            btn.disabled = false; btn.innerText = "XÁC NHẬN NẠP THẺ";
+
+                if(result.status === "success") { // Admin bypass
+                    saveHistory(result.key, pkgText);
+                    alert("THÀNH CÔNG! Key: " + result.key);
+                    location.reload();
+                } else {
+                    let count = 0;
+                    const check = setInterval(async () => {
+                        count++;
+                        const r = await fetch(SCRIPT_URL + "?check_id=" + serial);
+                        const final = await r.json();
+                        if(final.status === "success") {
+                            clearInterval(check); saveHistory(final.key, pkgText);
+                            alert("✅ NẠP THÀNH CÔNG! Key: " + final.key);
+                            location.reload();
+                        } else if(final.status === "error") {
+                            clearInterval(check); alert("❌ LỖI: Thẻ sai hoặc sai mệnh giá!");
+                            location.reload();
+                        } else if(count > 30) {
+                            clearInterval(check); alert("⚠️ Đang chờ duyệt, hãy check Lịch sử sau!");
+                            location.reload();
+                        }
+                    }, 3000);
+                }
+            } catch(e) { alert("Lỗi kết nối!"); btn.disabled = false; btn.innerText = "XÁC NHẬN NẠP THẺ"; }
         }
 
-        async function confirmBank() {
-            const bill = document.getElementById('billNote').value;
-            if(!bill) return alert("Vui lòng nhập mã giao dịch hoặc link ảnh bill!");
-            const btn = event.target; btn.disabled = true; btn.innerText = "ĐANG GỬI...";
-            try {
-                await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ action: "confirm_bank", orderCode: currentOrderCode, package: document.getElementById('package').selectedOptions[0].text, billNote: bill })});
-                alert("Đã gửi thông tin! Chờ HynoX check bill nhé.");
-                document.getElementById('billNote').value = "";
-            } catch (e) { alert("Lỗi gửi yêu cầu!"); }
-            btn.disabled = false; btn.innerText = "XÁC NHẬN ĐÃ CHUYỂN";
-        }
-
-        function saveHistory(key) {
-            let h = JSON.parse(localStorage.getItem('h_v15') || "[]");
-            h.unshift({ t: new Date().toLocaleString(), k: key, p: document.getElementById('package').selectedOptions[0].text });
-            localStorage.setItem('h_v15', JSON.stringify(h.slice(0, 5))); loadHistory();
+        function saveHistory(key, pkg) {
+            let h = JSON.parse(localStorage.getItem('hy_v1') || "[]");
+            h.unshift({ t: new Date().toLocaleString(), k: key, p: pkg });
+            localStorage.setItem('hy_v1', JSON.stringify(h.slice(0, 5)));
+            loadHistory();
         }
 
         function loadHistory() {
-            let h = JSON.parse(localStorage.getItem('h_v15') || "[]");
-            document.getElementById('historyList').innerHTML = h.length ? h.map(i => `
-                <div style="border-bottom:1px solid #333; padding:8px 0;">
-                    <b style="color:#00ff41">${i.p}</b> - <small>${i.t}</small><br>
-                    <code style="color:#fff; background:#222; padding:3px; display:inline-block; margin-top:5px;">${i.k}</code>
-                    <button onclick="navigator.clipboard.writeText('${i.k}');alert('Đã copy!')" style="font-size:10px; width:auto; padding:2px 5px; margin-left:10px;">Copy</button>
-                </div>`).join('') : "Chưa có giao dịch...";
+            let h = JSON.parse(localStorage.getItem('hy_v1') || "[]");
+            document.getElementById('historyList').innerHTML = h.map(i => `
+                <div style="border-bottom:1px solid #333; padding:10px 0;">
+                    <b style="color:#00ff41">${i.p}</b> <small>(${i.t})</small><br>
+                    <div style="display:flex; gap:8px; margin-top:5px;">
+                        <code style="background:#111; padding:5px; flex:1;">${i.k}</code>
+                        <button class="copy-btn" onclick="copyKey('${i.k}')">COPY</button>
+                    </div>
+                </div>`).join('');
         }
+
+        function copyKey(k) { navigator.clipboard.writeText(k); alert("Đã copy!"); }
+        window.onload = loadHistory;
     </script>
 </body>
 </html>
