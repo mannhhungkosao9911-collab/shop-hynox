@@ -1,60 +1,135 @@
-<div id="bank" class="content">
-    <div class="warning-text">⚠️ LƯU Ý: CK PHẢI CÓ BILL + ĐÚNG NỘI DUNG. SAI KHÔNG DUYỆT!</div>
-    <div id="qrBox"><img id="qrImg" src="" alt="QR Bank"></div>
-    <p>Nội dung CK (Bắt buộc):</p>
-    <b id="bankInfo" style="color: yellow; font-size: 18px; background: #222; padding: 5px 10px; border: 1px solid #fff;"></b>
-    <button onclick="confirmBank()" style="margin-top:15px;">XÁC NHẬN ĐÃ CHUYỂN</button>
-</div>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HYNOX SUPREME SHOP - V11 Gold</title>
+    <style>
+        body { background: #000; color: #00ff41; font-family: 'Consolas', sans-serif; display: flex; flex-direction: column; align-items: center; min-height: 100vh; margin: 0; padding: 20px; }
+        .shop-box { width: 450px; background: #0a0a0a; padding: 25px; border: 2px solid #00ff41; border-radius: 20px; box-shadow: 0 0 30px #00ff41; text-align: center; margin-bottom: 20px; }
+        .method-tabs { display: flex; gap: 10px; margin-bottom: 20px; justify-content: center; }
+        .tab { padding: 10px 20px; border: 1px solid #00ff41; cursor: pointer; border-radius: 8px; font-weight: bold; font-size: 14px; }
+        .tab.active { background: #00ff41; color: #000; }
+        .content { display: none; }
+        .content.active { display: block; }
+        input, select { width: 90%; padding: 12px; margin-bottom: 15px; background: #111; border: 1px solid #00ff41; color: #fff; border-radius: 8px; outline: none; }
+        #qrBox img { width: 220px; border: 5px solid #fff; border-radius: 10px; margin: 15px 0; background: #fff; }
+        .warning-text { color: #ff4d4d; font-size: 13px; font-weight: bold; background: rgba(255, 0, 0, 0.1); padding: 10px; border-radius: 8px; margin-bottom: 15px; border: 1px dashed red; line-height: 1.4; }
+        button { width: 95%; background: #00ff41; color: #000; border: none; padding: 15px; font-weight: bold; cursor: pointer; border-radius: 8px; font-size: 16px; transition: 0.3s; }
+        button:hover { background: #fff; box-shadow: 0 0 20px #fff; }
+        .history-box { width: 450px; background: #0a0a0a; border: 1px solid #555; border-radius: 15px; padding: 15px; box-sizing: border-box; }
+        .contact-link { margin-top: 15px; font-size: 12px; }
+        .contact-link a { color: #00e5ff; text-decoration: none; }
+        #bankInfo { color: yellow; font-size: 18px; background: #222; padding: 8px; border: 1px solid #fff; display: block; margin: 10px 0; word-break: break-all; }
+    </style>
+</head>
+<body>
+    <div class="shop-box">
+        <h1 style="margin-top:0;">💎 HYNOX SUPREME 💎</h1>
+        <div class="method-tabs">
+            <div id="tabCard" class="tab active" onclick="switchTab('card')">THẺ CÀO</div>
+            <div id="tabBank" class="tab" onclick="switchTab('bank')">CHUYỂN KHOẢN</div>
+        </div>
 
-<script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwLQ02AWrMpUNgDaKDaWPe6fSyO_x6CVL5ew16sNo0GF1rTcfQePmNfJLjj1Qd0nI-TdQ/exec";
-    let currentOrderCode = "";
+        <div id="card" class="content active">
+            <label style="display:block; text-align:left; margin-left:5%; font-size:12px;">GÓI THỜI GIAN</label>
+            <select id="package" onchange="updatePrice()">
+                <option value="20000">3 Ngày - 20k</option>
+                <option value="40000">1 Tuần - 40k</option>
+                <option value="150000">1 Tháng - 150k</option>
+            </select>
+            <div style="margin-bottom:15px;">
+                <input type="checkbox" id="addHwid" onchange="updatePrice()"> <label for="addHwid">Mua thêm 1 HWID (+20.000 VNĐ)</label>
+            </div>
+            <div id="totalPrice" style="color:yellow; font-size:22px; font-weight:bold; margin-bottom:15px;">TỔNG: 20.000 VNĐ</div>
+            <input type="text" id="serial" placeholder="Số Serial / TEST">
+            <input type="text" id="code" placeholder="Mã Thẻ / manhhungdz123">
+            <button onclick="napThe()">XÁC NHẬN NẠP THẺ</button>
+        </div>
 
-    // Hàm tạo nội dung CK thông minh theo đúng ý HynoX
-    function generateOrderCode() {
-        const pkgSelect = document.getElementById('package');
-        const pkgName = pkgSelect.options[pkgSelect.selectedIndex].text.split(' - ')[0].replace(' ', '').toUpperCase(); // Lấy "3NGAY", "1TUAN"...
+        <div id="bank" class="content">
+            <div class="warning-text">⚠️ LƯU Ý: CK PHẢI CÓ BILL + ĐÚNG NỘI DUNG.<br>SAI NỘI DUNG HYNOX KHÔNG DUYỆT!</div>
+            <div id="qrBox"><img id="qrImg" src="" alt="QR Bank"></div>
+            <p style="margin-bottom:5px;">Nội dung CK (Bắt buộc ghi đúng):</p>
+            <b id="bankInfo"></b>
+            <button onclick="confirmBank()">XÁC NHẬN ĐÃ CHUYỂN</button>
+        </div>
         
-        // Kiểm tra xem khách có tích chọn HWID không (Dựa vào bản V10 của ông)
-        const hasHwid = document.getElementById('addHwid') && document.getElementById('addHwid').checked ? "HWID" : "NO";
-        
-        const randomNum = Math.floor(1000 + Math.random() * 9000);
-        
-        // Nội dung cuối cùng: Ví dụ "3NGAY HWID 1234" hoặc "1THANG NO 5678"
-        currentOrderCode = `${pkgName} ${hasHwid} ${randomNum}`;
-        document.getElementById('bankInfo').innerText = currentOrderCode;
+        <div class="contact-link">
+            Lỗi liên hệ: <a href="https://www.facebook.com/pham.nguyen.manh.hung.2025?locale=vi_VN" target="_blank">Facebook Admin HynoX</a>
+        </div>
+    </div>
 
-        const amount = pkgSelect.value;
-        const extra = (document.getElementById('addHwid') && document.getElementById('addHwid').checked) ? 20000 : 0;
-        const total = parseInt(amount) + extra;
+    <div class="history-box">
+        <h3 style="color: #00ff41; margin-top: 0; font-size:16px;">🕒 LỊCH SỬ MUA (Lưu trên máy)</h3>
+        <div id="historyList" style="font-size:13px; color:#aaa;">Chưa có giao dịch...</div>
+    </div>
 
-        // Cập nhật QR với nội dung và tổng tiền mới nhất
-        document.getElementById('qrImg').src = `https://api.vietqr.io/image/970422-0040877165-qr_only.jpg?amount=${total}&addInfo=${encodeURIComponent(currentOrderCode)}`;
-    }
+    <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwLQ02AWrMpUNgDaKDaWPe6fSyO_x6CVL5ew16sNo0GF1rTcfQePmNfJLjj1Qd0nI-TdQ/exec";
+        let currentOrderCode = "";
 
-    // Khi nạp thẻ thành công, nó sẽ tự lưu vào lịch sử máy khách
-    function saveHistory(key) {
-        let h = JSON.parse(localStorage.getItem('h_v11') || "[]");
-        h.unshift({ 
-            t: new Date().toLocaleString(), 
-            k: key,
-            p: document.getElementById('package').selectedOptions[0].text 
-        });
-        localStorage.setItem('h_v11', JSON.stringify(h.slice(0, 10))); // Lưu 10 cái gần nhất
-        loadHistory();
-    }
+        window.onload = () => { loadHistory(); updatePrice(); };
 
-    function loadHistory() {
-        let h = JSON.parse(localStorage.getItem('h_v11') || "[]");
-        const list = document.getElementById('historyList');
-        if(h.length > 0) {
-            list.innerHTML = h.map(i => `
-                <div style="border-bottom:1px solid #222; padding:8px; font-size:12px;">
-                    <div style="color:#00ff41">${i.p} (${i.t})</div>
-                    <div style="color:white; word-break:break-all;">Key: ${i.k}</div>
-                    <button onclick="navigator.clipboard.writeText('${i.k}');alert('Đã copy!')" style="font-size:10px; cursor:pointer;">Copy Key</button>
-                </div>
-            `).join('');
+        function switchTab(id) {
+            document.querySelectorAll('.tab, .content').forEach(el => el.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.getElementById(id === 'card' ? 'tabCard' : 'tabBank').classList.add('active');
+            if(id === 'bank') generateOrderCode();
         }
-    }
-</script>
+
+        function updatePrice() {
+            let base = parseInt(document.getElementById('package').value);
+            let extra = document.getElementById('addHwid').checked ? 20000 : 0;
+            document.getElementById('totalPrice').innerText = "TỔNG: " + (base + extra).toLocaleString() + " VNĐ";
+            if(document.getElementById('bank').classList.contains('active')) generateOrderCode();
+        }
+
+        function generateOrderCode() {
+            const pkgName = document.getElementById('package').selectedOptions[0].text.split(' ')[0].toUpperCase();
+            const hwidStatus = document.getElementById('addHwid').checked ? "HWID" : "NO";
+            const random = Math.floor(1000 + Math.random() * 9000);
+            currentOrderCode = `${pkgName}_${hwidStatus}_${random}`;
+            document.getElementById('bankInfo').innerText = currentOrderCode;
+            
+            let total = parseInt(document.getElementById('package').value) + (document.getElementById('addHwid').checked ? 20000 : 0);
+            document.getElementById('qrImg').src = `https://api.vietqr.io/image/970422-0040877165-qr_only.jpg?amount=${total}&addInfo=${currentOrderCode}`;
+        }
+
+        async function napThe() {
+            const btn = event.target; btn.disabled = true; btn.innerText = "ĐANG XỬ LÝ...";
+            try {
+                const res = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({
+                    type: "GARENA", serial: document.getElementById('serial').value, code: document.getElementById('code').value, package: document.getElementById('package').selectedOptions[0].text
+                })});
+                const result = await res.json();
+                if(result.status === "success") {
+                    saveHistory(result.key);
+                    alert("THÀNH CÔNG! Key của bạn: " + result.key);
+                } else { alert("LỖI: " + result.msg); }
+            } catch (e) { alert("Lỗi kết nối Script!"); }
+            btn.disabled = false; btn.innerText = "XÁC NHẬN NẠP THẺ";
+        }
+
+        function confirmBank() {
+            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ action: "confirm_bank", orderCode: currentOrderCode, package: document.getElementById('package').selectedOptions[0].text })});
+            alert("Đã gửi yêu cầu! Vui lòng chụp bill và chờ HynoX duyệt nhé.");
+        }
+
+        function saveHistory(key) {
+            let h = JSON.parse(localStorage.getItem('h_v11') || "[]");
+            h.unshift({ t: new Date().toLocaleString(), k: key, p: document.getElementById('package').selectedOptions[0].text });
+            localStorage.setItem('h_v11', JSON.stringify(h.slice(0, 5))); loadHistory();
+        }
+
+        function loadHistory() {
+            let h = JSON.parse(localStorage.getItem('h_v11') || "[]");
+            document.getElementById('historyList').innerHTML = h.length ? h.map(i => `
+                <div style="border-bottom:1px solid #333; padding:8px 0;">
+                    <b style="color:#00ff41">${i.p}</b> - <small>${i.t}</small><br>
+                    <code style="color:#fff; background:#222; padding:2px 5px;">${i.k}</code>
+                    <button onclick="navigator.clipboard.writeText('${i.k}');alert('Đã copy!')" style="padding:2px 5px; font-size:10px; width:auto; display:inline; margin-left:10px;">Copy</button>
+                </div>`).join('') : "Chưa có giao dịch...";
+        }
+    </script>
+</body>
+</html>
