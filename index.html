@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HynoX Supreme - Shop Bán Key Auto</title>
+    <style>
+        body { background: #0a0a0a; color: #00ff41; font-family: 'Segoe UI', sans-serif; text-align: center; }
+        .container { max-width: 500px; margin: 50px auto; border: 2px solid #00ff41; padding: 20px; border-radius: 15px; box-shadow: 0 0 20px #00ff41; }
+        input, select { width: 90%; padding: 10px; margin: 10px 0; background: #1a1a1a; border: 1px solid #00ff41; color: #fff; }
+        button { background: #00ff41; color: #000; border: none; padding: 15px 30px; font-weight: bold; cursor: pointer; border-radius: 5px; }
+        button:hover { background: #008f11; color: #fff; }
+        #result { margin-top: 20px; padding: 15px; border: 1px dashed #fff; display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💎 HYNOX SUPREME SHOP 💎</h1>
+        <p>Hệ thống nạp thẻ tự động - Nhận Key ngay lập tức!</p>
+        <hr>
+        <select id="cardType">
+            <option value="VIETTEL">Viettel</option>
+            <option value="VINAPHONE">Vinaphone</option>
+            <option value="MOBIFONE">Mobifone</option>
+            <option value="ZING">Thẻ Zing</option>
+        </select>
+        <input type="text" id="serial" placeholder="Nhập Số Serial">
+        <input type="text" id="code" placeholder="Nhập Mã Thẻ">
+        <button onclick="napThe()">NẠP THẺ & LẤY KEY</button>
+        
+        <div id="result"></div>
+    </div>
+
+    <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwD5t7mXPYCwjghqFhhJhtq4x1ZgHYuYa_Kpj0il1GPiVJkN5-cOhZ2cVB1C3kmJ-M9ZQ/exec";
+
+        async function napThe() {
+            const btn = document.querySelector('button');
+            const resDiv = document.getElementById('result');
+            const data = {
+                type: document.getElementById('cardType').value,
+                serial: document.getElementById('serial').value,
+                code: document.getElementById('code').value
+            };
+
+            if(!data.serial || !data.code) return alert("Vui lòng nhập đủ thông tin!");
+            
+            btn.innerText = "ĐANG XỬ LÝ...";
+            btn.disabled = true;
+
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: "POST",
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                
+                resDiv.style.display = "block";
+                if(result.status === "success") {
+                    resDiv.innerHTML = `<h2 style="color:yellow">NẠP THÀNH CÔNG!</h2><p>Key của bạn: <b style="font-size:20px">${result.key}</b></p><p>Hãy lưu lại mã này!</p>`;
+                } else {
+                    resDiv.innerHTML = `<h2 style="color:red">LỖI: ${result.msg}</h2>`;
+                }
+            } catch (error) {
+                alert("Lỗi kết nối! Hãy kiểm tra lại Apps Script.");
+            }
+            btn.innerText = "NẠP THÈ & LẤY KEY";
+            btn.disabled = false;
+        }
+    </script>
+</body>
+</html>
