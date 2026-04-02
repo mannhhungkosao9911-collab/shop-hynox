@@ -10,12 +10,12 @@
         button { width: 100%; background: #00ff41; color: #000; border: none; padding: 15px; font-weight: bold; cursor: pointer; border-radius: 8px; font-size: 16px; transition: 0.3s; }
         button:hover { background: #fff; box-shadow: 0 0 15px #fff; }
         .history-box { width: 100%; max-width: 450px; background: #0a0a0a; border: 1px solid #333; border-radius: 15px; padding: 15px; margin-top: 20px; box-sizing: border-box; }
-        .copy-btn { width: auto; padding: 5px 12px; font-size: 11px; background: #00ff41; color: #000; border-radius: 4px; cursor: pointer; }
+        .copy-btn { width: auto; padding: 5px 12px; font-size: 11px; background: #00ff41; color: #000; border-radius: 4px; cursor: pointer; border:none; font-weight:bold; }
     </style>
 </head>
 <body>
     <div class="shop-box">
-        <h1>💎 HYNOX SUPREME 💎</h1>
+        <h1 style="margin-top:0;">💎 HYNOX SUPREME 💎</h1>
         
         <div style="text-align: left;">
             <label style="font-size: 12px;">CHỌN GÓI KEY:</label>
@@ -52,12 +52,13 @@
     </div>
 
     <div class="history-box">
-        <h3 style="color:#00ff41; margin:0 0 10px 0;">🕒 LỊCH SỬ MUA</h3>
-        <div id="historyList">Chưa có giao dịch...</div>
+        <h3 style="color:#00ff41; margin:0 0 10px 0; font-size:16px;">🕒 LỊCH SỬ MUA (Của bạn)</h3>
+        <div id="historyList" style="font-size:13px; color:#aaa;">Đang tải lịch sử...</div>
     </div>
 
     <script>
-        const SCRIPT_URL = "DÁN_URL_APPS_SCRIPT_CỦA_BẠN_VÀO_ĐÂY";
+        // Tui đã nhét link của ông vào đây rồi nhé!
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwLQ02AWrMpUNgDaKDaWPe6fSyO_x6CVL5ew16sNo0GF1rTcfQePmNfJLjj1Qd0nI-TdQ/exec";
 
         function updatePrice() {
             let base = parseInt(document.getElementById('package').value);
@@ -76,33 +77,40 @@
             btn.disabled = true; btn.innerText = "ĐANG KIỂM TRA...";
 
             try {
-                const res = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ type: telco, serial: serial, code: code, package: pkgText, amount: amount })});
-                const result = await res.json();
+                const res = await fetch(SCRIPT_URL, { 
+                    method: "POST", 
+                    mode: 'no-cors', // Dùng no-cors để tránh lỗi CORS khi gửi POST
+                    body: JSON.stringify({ type: telco, serial: serial, code: code, package: pkgText, amount: amount })
+                });
 
-                if(result.status === "success") { // Admin bypass
-                    saveHistory(result.key, pkgText);
-                    alert("THÀNH CÔNG! Key: " + result.key);
-                    location.reload();
-                } else {
-                    let count = 0;
-                    const check = setInterval(async () => {
-                        count++;
+                // Vì dùng no-cors nên mình sẽ bắt đầu vòng lặp check ngay sau khi gửi
+                let count = 0;
+                const check = setInterval(async () => {
+                    count++;
+                    try {
                         const r = await fetch(SCRIPT_URL + "?check_id=" + serial);
                         const final = await r.json();
+                        
                         if(final.status === "success") {
-                            clearInterval(check); saveHistory(final.key, pkgText);
-                            alert("✅ NẠP THÀNH CÔNG! Key: " + final.key);
+                            clearInterval(check); 
+                            saveHistory(final.key, pkgText);
+                            alert("✅ THÀNH CÔNG! Key của bạn: " + final.key);
                             location.reload();
                         } else if(final.status === "error") {
-                            clearInterval(check); alert("❌ LỖI: Thẻ sai hoặc sai mệnh giá!");
+                            clearInterval(check); 
+                            alert("❌ THẺ SAI: Sai mã, seri hoặc sai mệnh giá!");
                             location.reload();
                         } else if(count > 30) {
-                            clearInterval(check); alert("⚠️ Đang chờ duyệt, hãy check Lịch sử sau!");
+                            clearInterval(check); 
+                            alert("⚠️ Hệ thống đang duyệt, vui lòng check lại Lịch sử sau 1-2 phút!");
                             location.reload();
                         }
-                    }, 3000);
-                }
-            } catch(e) { alert("Lỗi kết nối!"); btn.disabled = false; btn.innerText = "XÁC NHẬN NẠP THẺ"; }
+                    } catch(e) {}
+                }, 3000);
+            } catch(e) { 
+                alert("Lỗi kết nối Server!"); 
+                btn.disabled = false; btn.innerText = "XÁC NHẬN NẠP THẺ"; 
+            }
         }
 
         function saveHistory(key, pkg) {
@@ -114,17 +122,23 @@
 
         function loadHistory() {
             let h = JSON.parse(localStorage.getItem('hy_v1') || "[]");
-            document.getElementById('historyList').innerHTML = h.map(i => `
+            const list = document.getElementById('historyList');
+            if(!h.length) { list.innerHTML = "Chưa có giao dịch..."; return; }
+            list.innerHTML = h.map(i => `
                 <div style="border-bottom:1px solid #333; padding:10px 0;">
-                    <b style="color:#00ff41">${i.p}</b> <small>(${i.t})</small><br>
-                    <div style="display:flex; gap:8px; margin-top:5px;">
-                        <code style="background:#111; padding:5px; flex:1;">${i.k}</code>
+                    <b style="color:#00ff41">${i.p}</b> <small style="color:#555;">(${i.t})</small><br>
+                    <div style="display:flex; gap:8px; margin-top:5px; align-items:center;">
+                        <code style="background:#111; padding:5px; flex:1; border:1px solid #222; font-size:11px;">${i.k}</code>
                         <button class="copy-btn" onclick="copyKey('${i.k}')">COPY</button>
                     </div>
                 </div>`).join('');
         }
 
-        function copyKey(k) { navigator.clipboard.writeText(k); alert("Đã copy!"); }
+        function copyKey(k) { 
+            navigator.clipboard.writeText(k); 
+            alert("✅ Đã copy Key!"); 
+        }
+
         window.onload = loadHistory;
     </script>
 </body>
