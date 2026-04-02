@@ -5,19 +5,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HynoX Supreme - Shop Bán Key Auto</title>
     <style>
-        body { background: #0a0a0a; color: #00ff41; font-family: 'Segoe UI', sans-serif; text-align: center; }
-        .container { max-width: 500px; margin: 50px auto; border: 2px solid #00ff41; padding: 20px; border-radius: 15px; box-shadow: 0 0 20px #00ff41; }
-        input, select { width: 90%; padding: 10px; margin: 10px 0; background: #1a1a1a; border: 1px solid #00ff41; color: #fff; }
-        button { background: #00ff41; color: #000; border: none; padding: 15px 30px; font-weight: bold; cursor: pointer; border-radius: 5px; }
-        button:hover { background: #008f11; color: #fff; }
-        #result { margin-top: 20px; padding: 15px; border: 1px dashed #fff; display: none; }
+        body { background: #000; color: #00ff41; font-family: 'Consolas', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .shop-box { width: 450px; background: #0a0a0a; padding: 30px; border: 2px solid #00ff41; border-radius: 20px; box-shadow: 0 0 30px #00ff41; text-align: center; }
+        h1 { font-size: 24px; text-shadow: 0 0 10px #00ff41; margin-bottom: 5px; }
+        .sub-text { color: #fff; font-size: 14px; margin-bottom: 20px; }
+        label { display: block; text-align: left; margin: 10px 0 5px 20px; font-size: 13px; font-weight: bold; }
+        input, select { width: 90%; padding: 12px; margin-bottom: 15px; background: #111; border: 1px solid #00ff41; color: #fff; border-radius: 8px; outline: none; }
+        .hwid-option { display: flex; align-items: center; justify-content: center; background: #1a1a1a; padding: 10px; border-radius: 8px; margin-bottom: 15px; border: 1px dashed #00ff41; }
+        #totalPrice { font-size: 20px; color: yellow; font-weight: bold; margin: 15px 0; }
+        button { width: 90%; background: #00ff41; color: #000; border: none; padding: 15px; font-weight: bold; cursor: pointer; border-radius: 8px; transition: 0.3s; font-size: 16px; }
+        button:hover { background: #fff; box-shadow: 0 0 20px #fff; }
+        #result { margin-top: 20px; padding: 15px; border: 1px solid #fff; display: none; background: #111; border-radius: 8px; }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="shop-box">
         <h1>💎 HYNOX SUPREME SHOP 💎</h1>
-        <p>Hệ thống nạp thẻ tự động - Nhận Key ngay lập tức!</p>
-        <hr>
+        <div class="sub-text">Hệ thống nạp thẻ tự động - Nhận Key ngay lập tức!</div>
+
+        <label>1. CHỌN GÓI THỜI GIAN</label>
+        <select id="package" onchange="updatePrice()">
+            <option value="20000">3 Ngày - 20.000 VNĐ</option>
+            <option value="40000">1 Tuần - 40.000 VNĐ</option>
+            <option value="150000">1 Tháng - 150.000 VNĐ</option>
+            <option value="500000">Vĩnh viễn (VV) - 500.000 VNĐ</option>
+        </select>
+
+        <div class="hwid-option">
+            <input type="checkbox" id="addHwid" style="width: 20px; margin: 0 10px 0 0;" onchange="updatePrice()"> 
+            <span>Mua thêm 1 HWID (+20.000 VNĐ)</span>
+        </div>
+
+        <div id="totalPrice">TỔNG: 20.000 VNĐ</div>
+
+        <label>2. THÔNG TIN THẺ CÀO</label>
         <select id="cardType">
             <option value="VIETTEL">Viettel</option>
             <option value="VINAPHONE">Vinaphone</option>
@@ -26,7 +47,8 @@
         </select>
         <input type="text" id="serial" placeholder="Nhập Số Serial">
         <input type="text" id="code" placeholder="Nhập Mã Thẻ">
-        <button onclick="napThe()">NẠP THẺ & LẤY KEY</button>
+
+        <button onclick="napThe()">XÁC NHẬN NẠP THẺ</button>
         
         <div id="result"></div>
     </div>
@@ -34,37 +56,41 @@
     <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwD5t7mXPYCwjghqFhhJhtq4x1ZgHYuYa_Kpj0il1GPiVJkN5-cOhZ2cVB1C3kmJ-M9ZQ/exec";
 
+        function updatePrice() {
+            let base = parseInt(document.getElementById('package').value);
+            let extra = document.getElementById('addHwid').checked ? 20000 : 0;
+            document.getElementById('totalPrice').innerText = "TỔNG: " + (base + extra).toLocaleString() + " VNĐ";
+        }
+
         async function napThe() {
             const btn = document.querySelector('button');
             const resDiv = document.getElementById('result');
             const data = {
                 type: document.getElementById('cardType').value,
                 serial: document.getElementById('serial').value,
-                code: document.getElementById('code').value
+                code: document.getElementById('code').value,
+                package: document.getElementById('package').selectedOptions[0].text,
+                hwid: document.getElementById('addHwid').checked ? "Có" : "Không"
             };
 
-            if(!data.serial || !data.code) return alert("Vui lòng nhập đủ thông tin!");
+            if(!data.serial || !data.code) return alert("Vui lòng nhập đủ thông tin thẻ!");
             
             btn.innerText = "ĐANG XỬ LÝ...";
             btn.disabled = true;
 
             try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: "POST",
-                    body: JSON.stringify(data)
-                });
+                const response = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(data) });
                 const result = await response.json();
-                
                 resDiv.style.display = "block";
                 if(result.status === "success") {
-                    resDiv.innerHTML = `<h2 style="color:yellow">NẠP THÀNH CÔNG!</h2><p>Key của bạn: <b style="font-size:20px">${result.key}</b></p><p>Hãy lưu lại mã này!</p>`;
+                    resDiv.innerHTML = `<h3 style="color:yellow">NẠP THÀNH CÔNG!</h3>
+                    <p>Gói: ${data.package}</p>
+                    <p>Key: <b style="font-size:20px; color:#00ff41;">${result.key}</b></p>`;
                 } else {
-                    resDiv.innerHTML = `<h2 style="color:red">LỖI: ${result.msg}</h2>`;
+                    resDiv.innerHTML = `<h3 style="color:red">LỖI: ${result.msg}</h3>`;
                 }
-            } catch (error) {
-                alert("Lỗi kết nối! Hãy kiểm tra lại Apps Script.");
-            }
-            btn.innerText = "NẠP THÈ & LẤY KEY";
+            } catch (e) { alert("Lỗi hệ thống!"); }
+            btn.innerText = "XÁC NHẬN NẠP THẺ";
             btn.disabled = false;
         }
     </script>
