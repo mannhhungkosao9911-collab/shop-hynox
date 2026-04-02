@@ -59,7 +59,7 @@
 
     <script>
         // LINK SCRIPT MỚI NHẤT CỦA HYNOX
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbBTY8av6FVOVf_SwDHq9LzAu2H2hod0GJqwm5Hn4E_gyFOfGlwJ8x21ByySk3lm_Rk6A/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwBTY8av6FVOVf_SwDHq9LzAu2H2hod0GJqwm5Hn4E_gyFOfGlwJ8x21ByySk3lm_Rk6A/exec";
 
         function updatePrice() {
             let base = parseInt(document.getElementById('package').value);
@@ -114,3 +114,7 @@
     </script>
 </body>
 </html>
+function doGet() {
+  return ContentService.createTextOutput("Máy chủ HynoX đang hoạt động!")
+    .setMimeType(ContentService.MimeType.TEXT);
+}
